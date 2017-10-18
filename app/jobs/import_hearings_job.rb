@@ -5,7 +5,7 @@ class ImportHearingsJob
     @scraper ||= Scraper::HearingsTask.new
   end
 
-  def perform(chamber_id)
+  def perform(chamber_id, should_enqueue_details)
     chamber = Chamber.find(chamber_id)
 
     committee_hearings_attrs = scraper.run(chamber)
@@ -30,7 +30,7 @@ class ImportHearingsJob
       hearing.save!
 
       # enqueue the bills import
-      ImportBillsJob.perform_async(hearing.id)
+      ImportBillsJob.perform_async(hearing.id, should_enqueue_details)
     end
   end
 end

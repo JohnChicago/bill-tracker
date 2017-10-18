@@ -29,38 +29,38 @@ describe ImportHearingsJob do
     end
 
     it "scrapes the chamber's hearings" do
-      subject.perform(chamber.id)
+      subject.perform(chamber.id, true)
       expect(mock_scraper).to have_received(:run).with(chamber)
     end
 
     it 'updates committees that already exist' do
-      subject.perform(chamber.id)
+      subject.perform(chamber.id, true)
       committee.reload
       expect(committee).to have_attributes(committee_attrs)
     end
 
     it 'updates hearings that already exist' do
-      subject.perform(chamber.id)
+      subject.perform(chamber.id, true)
       hearing.reload
       expect(hearing).to have_attributes(hearing_attrs)
     end
 
     it "creates committees that don't exist" do
-      expect { subject.perform(chamber.id) }.to change(Committee, :count).by(2)
+      expect { subject.perform(chamber.id, true) }.to change(Committee, :count).by(2)
     end
 
     it "creates hearings that don't exist" do
-      expect { subject.perform(chamber.id) }.to change(Hearing, :count).by(2)
+      expect { subject.perform(chamber.id, true) }.to change(Hearing, :count).by(2)
     end
 
     it 'import bills for each hearing' do
-      subject.perform(chamber.id)
+      subject.perform(chamber.id, true)
       expect(ImportBillsJob).to have_received(:perform_async).exactly(3).times
     end
 
     context "when the chamber doesn't exist" do
       it 'raises a not found error' do
-        expect { subject.perform(SecureRandom.uuid) }.to raise_error(ActiveRecord::RecordNotFound)
+        expect { subject.perform(SecureRandom.uuid, true) }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
 

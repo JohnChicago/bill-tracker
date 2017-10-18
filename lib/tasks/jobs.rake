@@ -3,7 +3,7 @@ namespace :jobs do
   task "import-hearings": :environment do
     puts '○ job:import-hearings - starting import jobs...'
     job_ids = Chamber.all.map.each do |chamber|
-      ImportHearingsJob.perform_async(chamber.id)
+      ImportHearingsJob.perform_async(chamber.id, true)
     end
     puts "✔ job:import-hearings - started jobs: #{job_ids}"
   end

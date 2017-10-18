@@ -17,28 +17,28 @@ describe ImportBillsJob do
     end
 
     it "scrapes the hearing's bills" do
-      subject.perform(hearing.id)
+      subject.perform(hearing.id, true)
       expect(mock_scraper).to have_received(:run).with(hearing)
     end
 
     it 'updates bills that already exist' do
-      subject.perform(hearing.id)
+      subject.perform(hearing.id, true)
       existing_bill.reload
       expect(existing_bill).to have_attributes(existing_bill_attrs)
     end
 
     it "creates bills that don't exist" do
-      expect { subject.perform(hearing.id) }.to change(Bill, :count).by(2)
+      expect { subject.perform(hearing.id, true) }.to change(Bill, :count).by(2)
     end
 
     it 'imports bill details for each bill' do
-      subject.perform(hearing.id)
+      subject.perform(hearing.id, true)
       expect(ImportBillDetailsJob).to have_received(:perform_async).exactly(3).times
     end
 
     context "when the hearing doesn't exist" do
       it 'raises a not found error' do
-        expect { subject.perform(SecureRandom.uuid) }.to raise_error(ActiveRecord::RecordNotFound)
+        expect { subject.perform(SecureRandom.uuid, true) }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
 
